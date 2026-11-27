@@ -1,6 +1,6 @@
 {
   "name": "@talaagent/protoc-gen-domain",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A protoc / buf plugin that generates domain TypeScript (Temporal types, null for absent, string-literal enums, flat oneofs) and codecs over protobuf-es",
   "license": "Apache-2.0",
   "repository": {
