@@ -1,6 +1,6 @@
 {
   "name": "@talaagent/proto-domain",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Runtime for protoc-gen-domain: protobuf <-> Temporal converters, codec types and a validated ConnectRPC client",
   "license": "Apache-2.0",
   "repository": {
