@@ -1,0 +1,70 @@
+# Release: changesets opens a "Version packages" PR; merging it publishes to
+# npm with trusted publishing (OIDC, provenance; no npm token). Publishing is
+# off until the repository variable NPM_RELEASE is "true". The buf module is
+# pushed to the BSR when the BUF_TOKEN secret is set.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  npm:
+    name: changesets version / npm publish
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: write # the version PR's branch and the release tags
+      pull-requests: write # the version PR
+      id-token: write # npm trusted publishing and provenance
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or later.
+      - run: npm install -g npm@latest
+      - run: pnpm install --frozen-lockfile
+      - uses: changesets/action@v1
+        with:
+          version: pnpm version-packages
+          # With no publish command the action only maintains the version PR.
+          publish: ${{ vars.NPM_RELEASE == 'true' && 'pnpm release' || '' }}
+          title: Version packages
+          commit: Version packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
+
+  buf:
+    name: buf push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Push buf.build/talaagent/domain
+        env:
+          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+        run: |
+          if [ -z "$BUF_TOKEN" ]; then
+            echo "BUF_TOKEN is not set; skipping buf push."
+            exit 0
+          fi
+          pnpm exec buf push proto --git-metadata
