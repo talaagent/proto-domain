@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package fixtures.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/type/color.proto";
+import "google/type/date.proto";
+import "google/type/datetime.proto";
+import "google/type/dayofweek.proto";
+import "google/type/decimal.proto";
+import "google/type/fraction.proto";
+import "google/type/interval.proto";
+import "google/type/latlng.proto";
+import "google/type/localized_text.proto";
+import "google/type/money.proto";
+import "google/type/month.proto";
+import "google/type/phone_number.proto";
+import "google/type/postal_address.proto";
+import "google/type/timeofday.proto";
+import "talaagent/domain/v1/calendar_duration.proto";
+import "talaagent/domain/v1/options.proto";
+
+// google.protobuf well-known types.
+message ProtobufTypes {
+  google.protobuf.Timestamp created_at = 1 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp deleted_at = 2;
+  google.protobuf.Duration timeout = 3;
+  google.protobuf.StringValue label = 4;
+  google.protobuf.Int64Value count = 5;
+  google.protobuf.BoolValue enabled = 6;
+  google.protobuf.BytesValue blob = 7;
+  google.protobuf.Struct metadata = 8;
+  google.protobuf.Value extra = 9;
+  google.protobuf.ListValue rows = 10;
+  google.protobuf.Any detail = 11;
+  google.protobuf.Empty nothing = 12;
+  google.protobuf.FieldMask mask = 13;
+  repeated google.protobuf.Duration laps = 14;
+}
+
+// google.type and talaagent.domain.v1 types.
+message CalendarTypes {
+  google.type.Date birth_date = 1;
+  google.type.Date card_expiry = 2 [(talaagent.domain.v1.field).date = DATE_FORM_YEAR_MONTH];
+  google.type.Date anniversary = 3 [(talaagent.domain.v1.field).date = DATE_FORM_MONTH_DAY];
+  google.type.Date start_date = 4 [(buf.validate.field).required = true];
+  google.type.TimeOfDay opens_at = 5;
+  google.type.DateTime starts_at = 6;
+  google.type.TimeZone time_zone = 7;
+  google.type.DayOfWeek weekday = 8;
+  google.type.Month month = 9;
+  repeated google.type.DayOfWeek workdays = 10;
+  google.type.Interval window = 11;
+  talaagent.domain.v1.CalendarDuration every = 12;
+  repeated google.type.Date holidays = 13 [(talaagent.domain.v1.field).date = DATE_FORM_MONTH_DAY];
+}
+
+// google.type value types that pass through.
+message ValueTypes {
+  google.type.LatLng location = 1;
+  google.type.Money price = 2;
+  google.type.Decimal amount = 3;
+  google.type.PhoneNumber phone = 4;
+  google.type.PostalAddress address = 5;
+  google.type.LocalizedText caption = 6;
+  google.type.Color tint = 7;
+  google.type.Fraction ratio = 8;
+  repeated google.type.Decimal amounts = 9;
+}

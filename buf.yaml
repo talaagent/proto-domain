@@ -1,0 +1,26 @@
+# One buf workspace for the repo: the published module (proto/) and the protos
+# the fixtures and the example compile against, so both resolve
+# talaagent/domain/v1 from this checkout instead of the BSR.
+version: v2
+modules:
+  # buf.build/talaagent/domain: the field options and CalendarDuration.
+  - path: proto
+    name: buf.build/talaagent/domain
+    lint:
+      use:
+        - STANDARD
+    breaking:
+      use:
+        - FILE
+  - path: examples/basic/proto
+    lint:
+      use:
+        - STANDARD
+  # Fixtures break naming rules on purpose (keywords as names, prefixless enums).
+  - path: packages/protoc-gen-domain/test/proto
+    lint:
+      use:
+        - MINIMAL
+deps:
+  - buf.build/bufbuild/protovalidate
+  - buf.build/googleapis/googleapis

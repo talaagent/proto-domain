@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package fixtures.v1;
+
+import "fixtures/shared/v1/shared.proto";
+import "fixtures/v1/brands.proto";
+import "google/protobuf/empty.proto";
+
+message GetAccountRequest {
+  string id = 1;
+}
+
+message GetAccountResponse {
+  Account account = 1;
+}
+
+message WatchRequest {}
+
+// A service: codec maps cover the unary methods only.
+service AccountService {
+  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse);
+  // Request and response from another package / a well-known type.
+  rpc Touch(fixtures.shared.v1.AuditStamp) returns (google.protobuf.Empty);
+  rpc Watch(WatchRequest) returns (stream GetAccountResponse);
+}

@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package fixtures.v1;
+
+import "buf/validate/validate.proto";
+
+// The usual enum: prefixed values with an UNSPECIFIED zero.
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_ACTIVE = 1;
+  STATUS_ON_HOLD = 2;
+  STATUS_ARCHIVED = 3;
+}
+
+// A meaningful zero value: kept in the union.
+enum Priority {
+  PRIORITY_NORMAL = 0;
+  PRIORITY_HIGH = 1;
+  PRIORITY_URGENT = 2;
+}
+
+// No shared prefix: nothing to strip.
+enum Shade {
+  SHADE_UNSPECIFIED = 0;
+  LIGHT = 1;
+  DARK = 2;
+}
+
+// Aliases: two names for one number.
+enum Level {
+  option allow_alias = true;
+  LEVEL_UNSPECIFIED = 0;
+  LEVEL_LOW = 1;
+  LEVEL_MINIMAL = 1;
+  LEVEL_HIGH = 2;
+}
+
+// An enum with only its zero value.
+enum Placeholder {
+  PLACEHOLDER_UNSPECIFIED = 0;
+}
+
+message EnumFields {
+  // Implicit presence with an UNSPECIFIED zero: 0 is null.
+  Status status = 1;
+  // Required: 0 throws on decode.
+  Status required_status = 2 [(buf.validate.field).required = true];
+  // proto3 optional.
+  optional Status optional_status = 3;
+  // A meaningful zero: never null.
+  Priority priority = 4;
+  Shade shade = 5;
+  Level level = 6;
+  repeated Status history = 7;
+  map<string, Priority> priorities = 8;
+  Placeholder placeholder = 9;
+
+  // An enum nested in a message.
+  enum Kind {
+    KIND_UNSPECIFIED = 0;
+    KIND_TASK = 1;
+    KIND_BUG = 2;
+  }
+  Kind kind = 10;
+}

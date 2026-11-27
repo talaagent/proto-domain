@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package fixtures.v1;
+
+import "buf/validate/validate.proto";
+import "talaagent/domain/v1/options.proto";
+
+// Every scalar type, with implicit and explicit presence.
+message Scalars {
+  double double_value = 1;
+  float float_value = 2;
+  int32 int32_value = 3;
+  int64 int64_value = 4;
+  uint32 uint32_value = 5;
+  uint64 uint64_value = 6;
+  sint32 sint32_value = 7;
+  sint64 sint64_value = 8;
+  fixed32 fixed32_value = 9;
+  fixed64 fixed64_value = 10;
+  sfixed32 sfixed32_value = 11;
+  sfixed64 sfixed64_value = 12;
+  bool bool_value = 13;
+  bytes bytes_value = 14;
+
+  // A plain proto3 string: "" on the wire is null in the domain.
+  string nickname = 15;
+  // Required by protovalidate: never null, "" passes through.
+  string display_name = 16 [(buf.validate.field).required = true];
+  // min_len 1: "" can't occur, so not nullable.
+  string handle = 17 [(buf.validate.field).string.min_len = 1];
+  // len 2: "" can't occur either.
+  string country_code = 18 [(buf.validate.field).string.len = 2];
+
+  // proto3 optional: null when unset.
+  optional string middle_name = 19;
+  optional int32 lucky_number = 20;
+  optional bool subscribed = 21;
+  // optional and required: not nullable, decode throws when unset.
+  optional int64 version = 22 [(buf.validate.field).required = true];
+  // Required through our own option instead of protovalidate.
+  optional string locale = 23 [(talaagent.domain.v1.field).required = true];
+}

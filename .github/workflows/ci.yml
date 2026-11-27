@@ -1,0 +1,89 @@
+# CI: lint, typecheck, test, buf lint/format/breaking, generated code up to
+# date, and the Nix dev shell.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: lint, typecheck, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm test
+
+  generated:
+    name: generated code is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Builds the plugin, then regenerates the fixtures and the example.
+      - run: pnpm generate
+      - name: Fail on a diff
+        run: |
+          git add --intent-to-add .
+          if ! git diff --exit-code; then
+            echo "::error::Generated code is stale: run 'pnpm generate' and commit the result."
+            exit 1
+          fi
+
+  buf:
+    name: buf lint, format, breaking
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec buf lint
+      - run: pnpm exec buf format --diff --exit-code
+      # Only the published module (proto/) has a compatibility promise; the
+      # test fixtures and the example change freely.
+      - name: buf breaking against main
+        run: |
+          if git cat-file -e origin/main:proto/talaagent 2>/dev/null; then
+            pnpm exec buf breaking proto --against ".git#ref=origin/main,subdir=proto"
+          else
+            echo "main has no proto/ module yet; nothing to compare against."
+          fi
+
+  nix:
+    name: Nix dev shell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - run: nix flake check -L
+      - run: nix develop --command sh -c 'node --version && buf --version'

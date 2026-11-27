@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package fixtures.v1;
+
+import "buf/validate/validate.proto";
+import "talaagent/domain/v1/options.proto";
+
+// Scalar brands from the field option.
+message Account {
+  string id = 1 [
+    (talaagent.domain.v1.field).brand = "AccountId",
+    (buf.validate.field).required = true
+  ];
+  // A branded implicit string still maps "" to null.
+  string referrer_id = 2 [(talaagent.domain.v1.field).brand = "AccountId"];
+  int64 balance = 3 [(talaagent.domain.v1.field).brand = "Cents"];
+  optional int64 credit_limit = 4 [(talaagent.domain.v1.field).brand = "Cents"];
+  repeated string member_ids = 5 [(talaagent.domain.v1.field).brand = "AccountId"];
+  map<string, int64> balances = 6 [(talaagent.domain.v1.field).brand = "Cents"];
+  bytes key_fingerprint = 7 [(talaagent.domain.v1.field).brand = "Fingerprint"];
+}
