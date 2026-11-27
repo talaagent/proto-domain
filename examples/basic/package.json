@@ -1,0 +1,24 @@
+{
+  "name": "@talaagent/example-basic",
+  "version": "0.0.0",
+  "private": true,
+  "description": "protoc-gen-domain end to end: buf generate, a validated domain client over ConnectRPC",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "generate": "buf generate",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.17.0",
+    "@bufbuild/protovalidate": "^1.3.0",
+    "@connectrpc/connect": "^2.3.0",
+    "@talaagent/proto-domain": "workspace:*",
+    "temporal-polyfill": "^1.0.8"
+  },
+  "devDependencies": {
+    "@bufbuild/protoc-gen-es": "^2.17.0",
+    "@talaagent/protoc-gen-domain": "workspace:*"
+  }
+}

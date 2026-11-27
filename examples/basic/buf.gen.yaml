@@ -1,0 +1,15 @@
+# In your project this is the same, with `remote` or `local` plugins as you
+# prefer: protoc-gen-es first, then protoc-gen-domain into the same `out`.
+version: v2
+inputs:
+  - directory: proto
+plugins:
+  - local: protoc-gen-es
+    out: src/gen
+    opt: [target=ts, import_extension=js]
+    include_imports: true
+  - local: protoc-gen-domain
+    out: src/gen
+    opt: [target=ts, import_extension=js, brand_import=../brands.js]
+    include_imports: true
+clean: true
