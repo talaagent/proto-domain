@@ -52,3 +52,8 @@ export function req<T>(value: T | undefined | null, path: string): T {
   }
   return value;
 }
+
+/** Throws a DomainDecodeError for a required field or oneof that is not set. */
+export function notSet(path: string): never {
+  throw new DomainDecodeError(path, "required field is not set");
+}

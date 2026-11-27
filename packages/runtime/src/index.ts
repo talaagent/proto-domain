@@ -40,6 +40,7 @@ export {
   type DomainInit,
   type MethodCodec,
   type NullableKeys,
+  notSet,
   req,
   type ServiceCodecs,
 } from "./types.js";

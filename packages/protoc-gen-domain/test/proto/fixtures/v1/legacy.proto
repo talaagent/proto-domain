@@ -1,0 +1,11 @@
+// proto2 presence: scalars read as their default when unset.
+syntax = "proto2";
+
+package fixtures.v1;
+
+message Legacy {
+  optional string name = 1;
+  required int32 count = 2;
+  optional string label = 3 [default = "none"];
+  optional Legacy parent = 4;
+}

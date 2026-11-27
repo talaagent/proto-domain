@@ -1,0 +1,56 @@
+{
+  "name": "@talaagent/protoc-gen-domain",
+  "version": "0.0.0",
+  "description": "A protoc / buf plugin that generates domain TypeScript (Temporal types, null for absent, string-literal enums, flat oneofs) and codecs over protobuf-es",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/talaagent/proto-domain.git",
+    "directory": "packages/protoc-gen-domain"
+  },
+  "homepage": "https://github.com/talaagent/proto-domain#readme",
+  "keywords": [
+    "protobuf",
+    "protoc-plugin",
+    "buf",
+    "protobuf-es",
+    "temporal",
+    "codegen"
+  ],
+  "type": "module",
+  "bin": {
+    "protoc-gen-domain": "./bin/protoc-gen-domain"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "proto"
+  ],
+  "scripts": {
+    "build": "rm -rf dist proto && tsc -p tsconfig.build.json && mkdir -p proto && cp -r ../../proto/talaagent proto/",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "generate": "buf build test/proto -o test/fixtures.binpb && buf generate --template test/buf.gen.yaml"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.6.0",
+    "@bufbuild/protoplugin": "^2.6.0"
+  },
+  "devDependencies": {
+    "@bufbuild/protoc-gen-es": "^2.17.0",
+    "@bufbuild/protovalidate": "^1.3.0",
+    "@talaagent/proto-domain": "workspace:*",
+    "temporal-polyfill": "^1.0.8"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

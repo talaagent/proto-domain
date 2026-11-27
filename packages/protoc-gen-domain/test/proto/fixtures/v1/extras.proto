@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package fixtures.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
+import "google/type/calendar_period.proto";
+import "google/type/datetime.proto";
+import "google/type/dayofweek.proto";
+import "talaagent/domain/v1/options.proto";
+
+// Edge cases: required wrappers and Struct, lists of wrappers, a jstype
+// int64, brands on wrappers, and a foreign enum.
+message Extras {
+  google.protobuf.Int32Value required_count = 1 [(buf.validate.field).required = true];
+  // A list of wrappers keeps its protobuf-es message elements.
+  repeated google.protobuf.StringValue aliases = 2;
+  google.protobuf.Struct required_attributes = 3 [(buf.validate.field).required = true];
+  repeated google.protobuf.Struct documents = 4;
+  // jstype = JS_STRING keeps an int64 a string.
+  int64 big_total = 5 [jstype = JS_STRING];
+  google.protobuf.StringValue parent_id = 6 [(talaagent.domain.v1.field).brand = "AccountId"];
+  string owner_id = 7 [
+    (talaagent.domain.v1.field).brand = "AccountId",
+    (buf.validate.field).required = true
+  ];
+  map<string, google.protobuf.Duration> timeouts = 8;
+  google.type.DateTime required_meeting = 9 [(buf.validate.field).required = true];
+  google.type.DayOfWeek required_day = 10 [(buf.validate.field).required = true];
+  // An enum outside the generated files passes through as protobuf-es's enum.
+  google.type.CalendarPeriod period = 11;
+  // An implicit number is never null.
+  int32 visit_count = 12;
+}
