@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+import { runNodeJs } from "@bufbuild/protoplugin";
+import { protocGenDomain } from "../dist/index.js";
+
+runNodeJs(protocGenDomain);

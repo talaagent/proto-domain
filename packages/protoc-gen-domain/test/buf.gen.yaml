@@ -1,0 +1,16 @@
+# Generates the fixtures: protoc-gen-es, then this plugin from its build.
+# Run `pnpm generate` in this package (paths are relative to it) after a build.
+version: v2
+inputs:
+  # The fixture module of the repo's buf workspace.
+  - directory: test/proto
+plugins:
+  - local: ["node", "node_modules/@bufbuild/protoc-gen-es/bin/protoc-gen-es"]
+    out: test/gen
+    opt: [target=ts, import_extension=js]
+    include_imports: true
+  - local: ["node", "bin/protoc-gen-domain"]
+    out: test/gen
+    opt: [target=ts, import_extension=js]
+    include_imports: true
+clean: true

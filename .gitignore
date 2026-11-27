@@ -6,3 +6,5 @@ coverage/
 result
 result-*
 .direnv/
+# The plugin package bundles a copy of proto/ at build time.
+packages/protoc-gen-domain/proto/
