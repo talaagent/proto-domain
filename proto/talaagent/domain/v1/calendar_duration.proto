@@ -1,0 +1,38 @@
+// Copyright 2026 The proto-domain Authors
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package talaagent.domain.v1;
+
+option go_package = "github.com/talaagent/proto-domain/gen/go/talaagent/domain/v1;domainv1";
+
+// A duration that may hold calendar units (years, months, weeks, days), like an
+// ISO 8601 duration (`P1Y2M3DT4H`). protoc-gen-domain maps it to
+// Temporal.Duration.
+//
+// Use google.protobuf.Duration for an exact span of time (a timeout, an
+// elapsed time). Use CalendarDuration when the length depends on where it is
+// applied: "1 month" from January 31, "1 day" across a daylight saving change.
+//
+// Every field is set separately and nothing is balanced: `months: 14` stays 14
+// months. All non-zero fields must have the same sign.
+message CalendarDuration {
+  // Years.
+  int64 years = 1;
+  // Months.
+  int64 months = 2;
+  // Weeks.
+  int64 weeks = 3;
+  // Days.
+  int64 days = 4;
+  // Hours.
+  int64 hours = 5;
+  // Minutes.
+  int64 minutes = 6;
+  // Seconds.
+  int64 seconds = 7;
+  // The fraction of a second in nanoseconds, -999,999,999 to 999,999,999, with
+  // the same sign as the other fields.
+  int32 nanos = 8;
+}

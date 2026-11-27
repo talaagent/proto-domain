@@ -1,0 +1,8 @@
+packages:
+  - packages/*
+  - examples/*
+
+# @bufbuild/buf's postinstall only swaps in the platform binary to skip a
+# Node shim; the shim works without it.
+allowBuilds:
+  "@bufbuild/buf": false

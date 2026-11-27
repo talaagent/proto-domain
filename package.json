@@ -1,0 +1,31 @@
+{
+  "name": "proto-domain-workspace",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@12.23.0",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter '@talaagent/*' run build",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "buf:lint": "buf lint",
+    "buf:breaking": "buf breaking proto --against '.git#branch=main,subdir=proto'",
+    "generate": "pnpm build && pnpm -r --if-present run generate",
+    "changeset": "changeset",
+    "version-packages": "changeset version && pnpm install --lockfile-only",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.9",
+    "@bufbuild/buf": "1.75.0",
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.2"
+  }
+}

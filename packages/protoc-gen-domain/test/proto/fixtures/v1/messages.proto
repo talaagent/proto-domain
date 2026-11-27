@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package fixtures.v1;
+
+import "buf/validate/validate.proto";
+import "fixtures/shared/v1/shared.proto";
+import "google/protobuf/timestamp.proto";
+
+// Nested messages, repeated and map fields.
+message Container {
+  // A nested message type.
+  message Item {
+    string label = 1 [(buf.validate.field).required = true];
+    int32 quantity = 2;
+  }
+  // Optional submessage: null when unset.
+  Item featured = 1;
+  // Required submessage: decode throws when unset.
+  Item primary = 2 [(buf.validate.field).required = true];
+  repeated Item items = 3;
+  repeated string tags = 4;
+  repeated google.protobuf.Timestamp checkpoints = 5;
+  map<string, Item> items_by_id = 6;
+  map<int32, string> names_by_number = 7;
+  map<int64, google.protobuf.Timestamp> times_by_id = 8;
+  map<bool, string> flags = 9;
+  // Cross-package message and enum.
+  fixtures.shared.v1.AuditStamp created = 10;
+  fixtures.shared.v1.Visibility visibility = 11;
+  repeated fixtures.shared.v1.AuditStamp edits = 12;
+}
+
+// Recursion, direct and through a list.
+message TreeNode {
+  string name = 1 [(buf.validate.field).required = true];
+  TreeNode parent = 2;
+  repeated TreeNode children = 3;
+}
+
+// Mutual recursion.
+message Ping {
+  Pong pong = 1;
+}
+
+// Mutual recursion.
+message Pong {
+  Ping ping = 1;
+}
+
+// No fields.
+message Nothing {}
+
+// Field and message names that are JavaScript keywords or built-ins.
+message Object {
+  string class = 1;
+  string function = 2;
+  int32 default = 3;
+  bool delete = 4;
+  string constructor = 5;
+  string to_string = 6;
+}
+
+// Oneofs: scalars, messages, a well-known type, and a required oneof.
+message Shape {
+  message Circle {
+    double radius = 1;
+  }
+  message Rect {
+    double width = 1;
+    double height = 2;
+  }
+  oneof kind {
+    Circle circle = 1;
+    Rect rect = 2;
+    string svg_path = 3;
+  }
+  oneof stamp {
+    option (buf.validate.oneof).required = true;
+    google.protobuf.Timestamp drawn_at = 4;
+    int64 frame = 5;
+  }
+}

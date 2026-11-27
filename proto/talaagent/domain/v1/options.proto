@@ -1,0 +1,56 @@
+// Copyright 2026 The proto-domain Authors
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package talaagent.domain.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/talaagent/proto-domain/gen/go/talaagent/domain/v1;domainv1";
+
+// How protoc-gen-domain maps one field onto its TypeScript domain type.
+//
+// Set it with the `field` extension:
+//
+//     string owner_id = 1 [(talaagent.domain.v1.field).brand = "UserId"];
+//     google.type.Date card_expiry = 2 [(talaagent.domain.v1.field).date = DATE_FORM_YEAR_MONTH];
+message FieldOptions {
+  // A nominal type name for a scalar field (string, bytes, or any integer type),
+  // e.g. "UserId" or "Cents". The domain type becomes `Brand<T, "UserId">` from
+  // the runtime, or the `UserId` type of the module named by the plugin's
+  // `brand_import` option. A brand is a compile-time type only: the codecs cast,
+  // they don't check. On a repeated or map field it applies to each element
+  // (each value, for a map). Must be a TypeScript identifier.
+  string brand = 1;
+
+  // Which form of google.type.Date the field holds. Only valid on a
+  // google.type.Date field. Unset means DATE_FORM_FULL.
+  DateForm date = 2;
+
+  // The field is always set: the domain type is not nullable and decoding a
+  // message without it throws. The same as `(buf.validate.field).required`, for
+  // schemas that don't use protovalidate. Ignored on repeated and map fields.
+  bool required = 3;
+}
+
+// The form of a google.type.Date field: google.type.Date may leave out the year
+// or the day (a zero), and each form maps to its own Temporal type.
+enum DateForm {
+  // The default: the same as DATE_FORM_FULL.
+  DATE_FORM_UNSPECIFIED = 0;
+  // Year, month and day are all set. Maps to Temporal.PlainDate.
+  DATE_FORM_FULL = 1;
+  // Year and month are set and the day is 0 (a card expiry, a billing month).
+  // Maps to Temporal.PlainYearMonth.
+  DATE_FORM_YEAR_MONTH = 2;
+  // Month and day are set and the year is 0 (a birthday, a holiday). Maps to
+  // Temporal.PlainMonthDay.
+  DATE_FORM_MONTH_DAY = 3;
+}
+
+extend google.protobuf.FieldOptions {
+  // Field number 51234 is in the range for in-house options (50000-99999), see
+  // https://github.com/protocolbuffers/protobuf/blob/main/docs/options.md
+  FieldOptions field = 51234;
+}

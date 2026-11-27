@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package fixtures.shared.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// A message from another package, to test cross-package codec imports.
+message AuditStamp {
+  // Who made the change.
+  string actor = 1;
+  // When.
+  google.protobuf.Timestamp at = 2;
+}
+
+// An enum from another package.
+enum Visibility {
+  VISIBILITY_UNSPECIFIED = 0;
+  VISIBILITY_PUBLIC = 1;
+  VISIBILITY_PRIVATE = 2;
+}

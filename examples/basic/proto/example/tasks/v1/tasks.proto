@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package example.tasks.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/type/date.proto";
+import "talaagent/domain/v1/calendar_duration.proto";
+import "talaagent/domain/v1/options.proto";
+
+// A task in a to-do list.
+message Task {
+  // The task's id.
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (talaagent.domain.v1.field).brand = "TaskId"
+  ];
+  // A one-line title.
+  string title = 2 [(buf.validate.field).string.min_len = 1];
+  // Free-form notes; empty is null.
+  string notes = 3;
+  // Where the task is.
+  TaskStatus status = 4 [(buf.validate.field).required = true];
+  // The day it is due, if any.
+  google.type.Date due_date = 5;
+  // When it was created.
+  google.protobuf.Timestamp create_time = 6 [(buf.validate.field).required = true];
+  // How long it should take.
+  google.protobuf.Duration estimate = 7;
+  // Repeat every so often ("P1W", "P1M").
+  talaagent.domain.v1.CalendarDuration recurrence = 8;
+  // Who the task is assigned to.
+  oneof assignee {
+    // A person.
+    string user_id = 9;
+    // A team.
+    string team_name = 10;
+  }
+}
+
+// Where a task is.
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  // Not started.
+  TASK_STATUS_TODO = 1;
+  // Being worked on.
+  TASK_STATUS_IN_PROGRESS = 2;
+  // Finished.
+  TASK_STATUS_DONE = 3;
+}
+
+// The request for TaskService.CreateTask.
+message CreateTaskRequest {
+  // The title of the new task.
+  string title = 1 [(buf.validate.field).string.min_len = 1];
+  // Notes, optional.
+  string notes = 2;
+  // The due date, optional.
+  google.type.Date due_date = 3;
+  // The estimate, optional.
+  google.protobuf.Duration estimate = 4;
+  // The recurrence, optional.
+  talaagent.domain.v1.CalendarDuration recurrence = 5;
+}
+
+// The response for TaskService.CreateTask.
+message CreateTaskResponse {
+  // The new task.
+  Task task = 1 [(buf.validate.field).required = true];
+}
+
+// The request for TaskService.ListTasks.
+message ListTasksRequest {
+  // Only tasks in this status; unset lists all.
+  TaskStatus status = 1;
+}
+
+// The response for TaskService.ListTasks.
+message ListTasksResponse {
+  // The tasks.
+  repeated Task tasks = 1;
+}
+
+// Manages tasks.
+service TaskService {
+  // Creates a task.
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+  // Lists tasks.
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse);
+}
